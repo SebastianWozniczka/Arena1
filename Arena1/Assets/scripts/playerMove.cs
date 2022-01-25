@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class playerMove : MonoBehaviour
+public class PlayerMove : MonoBehaviour
 {
 
     private Rigidbody2D playerRigidbody2D;
@@ -16,7 +16,7 @@ public class playerMove : MonoBehaviour
     public new Transform transform;
     public AudioSource audioSource1;
 
-    GameObject a;
+   // GameObject a;
 
 
 
@@ -24,12 +24,11 @@ public class playerMove : MonoBehaviour
     private float y;
     private bool isLeft = false, isRight = false, isUp = false;
 
-    private float moveSpeed = 2.0f;
-    private float launchSpeed = 6.0f;
+    private readonly float moveSpeed = 2.0f;
+    private readonly float launchSpeed = 6.0f;
     private bool isGrounded;
     private bool facingDirection;
-    private bool isTouched;
-    private float timer,timer2,timer1b,timer3;
+    private float timer,timer2,timer1b;
     public float inputX;
 
 
@@ -38,16 +37,13 @@ public class playerMove : MonoBehaviour
         playerRigidbody2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
  
-        left.onClick.AddListener(moveLeft);
-        right.onClick.AddListener(moveRight);
-        up.onClick.AddListener(jump);
+        left.onClick.AddListener(MoveLeft);
+        right.onClick.AddListener(MoveRight);
+        up.onClick.AddListener(Jump);
         animator.SetTrigger("stand");
        
-        
-
         timer = 0;
         timer2 = 0;
-        isTouched = false;
         
 
     }
@@ -57,12 +53,21 @@ public class playerMove : MonoBehaviour
     {
 
         
-
+       
        
         posX=playerRigidbody2D.position.x;
 
+        if (posX > 10)
+        {
+            playerRigidbody2D.transform.position = new Vector2(-10, playerRigidbody2D.position.y);
+        }
 
-        playerRotate();
+        if (posX < -10)
+        {
+            playerRigidbody2D.transform.position = new Vector2(10, playerRigidbody2D.position.y);
+        }
+
+        PlayerRotate();
 
         if (!isGrounded)
         {
@@ -125,16 +130,6 @@ public class playerMove : MonoBehaviour
           
 
 
-         /*  if (!isTouched)
-             {
-                 timer3 += Time.deltaTime;
-                 if (timer3 > 5)
-                 {
-                     spriteRenderer.sprite = sprite1;
-                     timer3 = 0;
-                 }
-             }
-           */ 
            
 
 
@@ -159,12 +154,12 @@ public class playerMove : MonoBehaviour
         Debug.Log(polygonCollider2D.points.GetValue(0));
     }
 
-    void playerRotate()
+    void PlayerRotate()
     {
       
         inputX = playerRigidbody2D.velocity.x;
 
-        if (inputX < 0 && !facingDirection && isTouched)
+        if (inputX < 0 && !facingDirection)
         {
             timer2 += Time.deltaTime;
             if (timer2 > 0.2f)
@@ -174,7 +169,7 @@ public class playerMove : MonoBehaviour
                 timer2 = 0;
             }
         }
-        else if (inputX > 0 && facingDirection && isTouched)
+        else if (inputX > 0 && facingDirection)
         {
             timer1b += Time.deltaTime;
             if (timer1b > 0.2f)
@@ -210,12 +205,7 @@ public class playerMove : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         isGrounded = true;
-        if (collision.gameObject.name == "start")
-        {
-            isTouched = true;
-        }
-        else
-            isTouched = false;
+       
     }
 
     private void OnCollisionExit2D(Collision2D collision)
@@ -223,17 +213,17 @@ public class playerMove : MonoBehaviour
         isGrounded = false;
     }
 
-    private void moveLeft()
+    private void MoveLeft()
     {
         isLeft = true;
     }
 
-    private void moveRight()
+    private void MoveRight()
     {
         isRight = true;
     }
 
-    private void jump()
+    private void Jump()
     {
         isUp = true;
     }
